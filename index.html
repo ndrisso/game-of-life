@@ -7,10 +7,31 @@
   <meta name = "description" content="A simple implementation of Conway's Game of Life in JS">
   <meta name = "author" content="Nicolas Risso">
 
+  <style>
+    body {
+      background-color: black;
+      margin: 0px;
+    }
 
+    .body-wrapper {
+      width: 100%;
+      padding-top:100px;
+    }
+
+    .map {
+      margin-left: auto;
+      margin-right: auto;
+      width:500px;
+      height:500px;
+    }
+  </style>
 </head>
-<body style="background-color: black">
-  <canvas id="map"></canvas>
+<body>
+  <div class="body-wrapper">
+    <div class="map">
+      <canvas id="map" width="500" height="500"></canvas>
+    </div>
+  </div>
   <script src = "dist/app.js"></script>
 </body>
 </html>
