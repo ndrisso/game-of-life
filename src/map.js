@@ -1,35 +1,31 @@
-export default class Map {
-  constructor({ width, height, ctx }) {
-    this._width  = width;
-    this._height = height;
-    this._ctx   = ctx;
-  }
+const map = ({ width, height, ctx }) => {
 
-  emptyMap() {
-    this._ctx.fillStyle = "white";
-    this._ctx.fillRect(0, 0, this._width, this._height);
+  const emptyMap = () => {
+    ctx.fillStyle = "white"
+    ctx.fillRect(0, 0, width, height)
   }
-
-  drawGrid() {
-    this._ctx.fillStyle = "black";
-    for(let i = 0; i < this._width; i += 10){
-      this._ctx.beginPath();
-      this._ctx.moveTo(i, 0);
-      this._ctx.lineTo(i, this._height);
-      this._ctx.stroke();
+  const drawGrid = () => {
+    ctx.fillStyle = "black"
+    for(let i = 0; i < width; i += 10){
+      ctx.beginPath()
+      ctx.moveTo(i, 0)
+      ctx.lineTo(i, height)
+      ctx.stroke()
     }
-    for(let j = 0; j < this._height; j += 10){
-      this._ctx.beginPath();
-      this._ctx.moveTo(0, j);
-      this._ctx.lineTo(this._width, j);
-      this._ctx.stroke();
+    for(let j = 0; j < height; j += 10){
+      ctx.beginPath()
+      ctx.moveTo(0, j)
+      ctx.lineTo(width, j)
+      ctx.stroke()
     }
   }
 
-  initMap() {
-    debugger
-    this.emptyMap();
-    this.drawGrid();
+  return {
+    initMap: () => {
+      emptyMap()
+      drawGrid()
+    }
   }
-
 }
+
+export default map
