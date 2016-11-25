@@ -4,7 +4,8 @@
   "description": "Conway's game of life written in JS",
   "main": "app.js",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.config.js"
+    "start": "webpack-dev-server --config webpack.config.js",
+    "build": "webpack --config webpack.config.js"
   },
   "keywords": [
     "conway",
