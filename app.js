@@ -1,9 +1,9 @@
-import { start } from './src/engine'
+import engine from './src/engine'
 
-const elem   = document.getElementById("map")
-const ctx    = elem.getContext("2d")
-const HEIGHT = 500
-const WIDTH  = 500
+const elem = document.getElementById("map")
+const ctx  = elem.getContext("2d")
+const rows = 50
+const cols = 50
 
-start({ rows: WIDTH / 10, cols: HEIGHT / 10, ctx })
+engine({ rows, cols, ctx }).start()
 console.log("started!")
