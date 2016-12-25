@@ -3,19 +3,36 @@ import map from './map'
 
 const engine = (mapProps) => {
 
-  let matrix           = []
-  let _map             = map(mapProps)
-  const { rows, cols } = mapProps
+  let generation   = 0
+  let matrix       = []
+  let livingCells  = 0
+  let running      = false
+  let gameInterval = null
+
+  const _map = map(mapProps)
+  const { rows, cols, updateLivinigCells, updateGeneration } = mapProps
 
   const randomizeMatrix = () => {
     for(let i = 0; i < rows; i++) {
       matrix[i] = []
       for(let j = 0; j < cols; j++) {
         // Giving more weight to death cells
-        let rand = Math.floor(Math.random() * 8)
-        matrix[i][j] = rand === 0 ? 1 : 0
+        let rand = Math.floor(Math.random() * 12)
+
+        matrix[i][j] = 0
+        if(rand === 0) {
+          matrix[i][j] = 1
+          livingCells++;
+        }
       }
     }
+  }
+
+  const reset = () => {
+    generation  = 0
+    livingCells = 0
+    matrix      = []
+    clearInterval(gameInterval)
   }
 
   const updateLife = () => {
@@ -26,8 +43,10 @@ const engine = (mapProps) => {
 
         if(alive === 3 && elem === 0) {
           matrix[i][j] = 1
+          livingCells++;
         }else if((alive < 2 || alive > 3) && elem === 1) {
           matrix[i][j] = 0
+          livingCells--;
         }
       }
     }
@@ -51,17 +70,37 @@ const engine = (mapProps) => {
     return alives - matrix[row][col]
   }
 
-  const start = () => {
-    randomizeMatrix()
-
-    setInterval(() => {
+  const startGameLoop = () => {
+    gameInterval = setInterval(() => {
+      generation++;
       updateLife()
+      updateLivinigCells(livingCells)
+      updateGeneration(generation)
       _map.drawMap(matrix)
     }, 200);
+
+    running = true;
+  }
+
+  const start = () => {
+    reset()
+    randomizeMatrix()
+    startGameLoop()
+  }
+
+
+  const pause = () => {
+    if(!running) {
+      startGameLoop()
+    } else {
+      clearInterval(gameInterval)
+      running = false;
+    }
   }
 
   return {
-    start
+    start,
+    pause
   }
 }
 

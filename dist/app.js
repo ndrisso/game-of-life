@@ -46,19 +46,45 @@
 
 	"use strict";
 
-	var _engine = __webpack_require__(1);
+	var _engine2 = __webpack_require__(1);
 
-	var _engine2 = _interopRequireDefault(_engine);
+	var _engine3 = _interopRequireDefault(_engine2);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var elem = document.getElementById("map");
-	var ctx = elem.getContext("2d");
+	var mapElem = document.getElementById("map");
+	var generationElem = document.getElementById("generation");
+	var livingCellsElem = document.getElementById("livingCells");
+	var resetButton = document.getElementById("reset");
+	var pauseButton = document.getElementById("pause");
+
+	var updateLivinigCells = function updateLivinigCells(livingCells) {
+	  livingCellsElem.innerText = livingCells;
+	};
+
+	var updateGeneration = function updateGeneration(generation) {
+	  generationElem.innerText = generation;
+	};
+
+	var ctx = mapElem.getContext("2d");
 	var rows = 50;
 	var cols = 50;
 
-	(0, _engine2.default)({ rows: rows, cols: cols, ctx: ctx }).start();
-	console.log("started!");
+	var _engine = (0, _engine3.default)({ rows: rows, cols: cols, ctx: ctx, updateLivinigCells: updateLivinigCells, updateGeneration: updateGeneration });
+
+	console.log("Assigning listeners to buttons...");
+	resetButton.onclick = function () {
+	  pauseButton.value = "Pause";
+	  _engine.start();
+	};
+	pauseButton.onclick = function () {
+	  pauseButton.value = pauseButton.value === "Pause" ? "Resume" : "Pause";
+	  _engine.pause();
+	};
+	console.log("Listeners assigned!");
+
+	_engine.start();
+	console.log("Game started!");
 
 /***/ },
 /* 1 */
@@ -78,10 +104,17 @@
 
 	var engine = function engine(mapProps) {
 
+	  var generation = 0;
 	  var matrix = [];
+	  var livingCells = 0;
+	  var running = false;
+	  var gameInterval = null;
+
 	  var _map = (0, _map3.default)(mapProps);
 	  var rows = mapProps.rows,
-	      cols = mapProps.cols;
+	      cols = mapProps.cols,
+	      updateLivinigCells = mapProps.updateLivinigCells,
+	      updateGeneration = mapProps.updateGeneration;
 
 
 	  var randomizeMatrix = function randomizeMatrix() {
@@ -89,10 +122,22 @@
 	      matrix[i] = [];
 	      for (var j = 0; j < cols; j++) {
 	        // Giving more weight to death cells
-	        var rand = Math.floor(Math.random() * 8);
-	        matrix[i][j] = rand === 0 ? 1 : 0;
+	        var rand = Math.floor(Math.random() * 12);
+
+	        matrix[i][j] = 0;
+	        if (rand === 0) {
+	          matrix[i][j] = 1;
+	          livingCells++;
+	        }
 	      }
 	    }
+	  };
+
+	  var reset = function reset() {
+	    generation = 0;
+	    livingCells = 0;
+	    matrix = [];
+	    clearInterval(gameInterval);
 	  };
 
 	  var updateLife = function updateLife() {
@@ -103,8 +148,10 @@
 
 	        if (alive === 3 && elem === 0) {
 	          matrix[i][j] = 1;
+	          livingCells++;
 	        } else if ((alive < 2 || alive > 3) && elem === 1) {
 	          matrix[i][j] = 0;
+	          livingCells--;
 	        }
 	      }
 	    }
@@ -128,17 +175,36 @@
 	    return alives - matrix[row][col];
 	  };
 
-	  var start = function start() {
-	    randomizeMatrix();
-
-	    setInterval(function () {
+	  var startGameLoop = function startGameLoop() {
+	    gameInterval = setInterval(function () {
+	      generation++;
 	      updateLife();
+	      updateLivinigCells(livingCells);
+	      updateGeneration(generation);
 	      _map.drawMap(matrix);
 	    }, 200);
+
+	    running = true;
+	  };
+
+	  var start = function start() {
+	    reset();
+	    randomizeMatrix();
+	    startGameLoop();
+	  };
+
+	  var pause = function pause() {
+	    if (!running) {
+	      startGameLoop();
+	    } else {
+	      clearInterval(gameInterval);
+	      running = false;
+	    }
 	  };
 
 	  return {
-	    start: start
+	    start: start,
+	    pause: pause
 	  };
 	};
 
